@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Summary Details - Text Summarizer{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-alt"></i> Summary Details</h2>
+    <div>
+        <a href="{{ url_for('history') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        <form method="POST" action="{{ url_for('delete_summary', summary_id=summary.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this summary?')">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-bar"></i> Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-primary">{{ summary.original_length }}</h4>
+                            <small class="text-muted">Original Words</small>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="border rounded p-3">
+                            <h4 class="text-success">{{ summary.summary_length }}</h4>
+                            <small class="text-muted">Summary Words</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h4 class="text-warning">{{ "%.1f"|format(summary.compression_ratio) }}x</h4>
+                            <small class="text-muted">Compression Ratio</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3">
+                            <h4 class="text-info">{{ summary.created_at.strftime('%m/%d/%Y') }}</h4>
+                            <small class="text-muted">Created Date</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-info-circle"></i> Summary Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Title:</dt>
+                    <dd class="col-sm-8">{{ summary.title }}</dd>
+                    
+                    <dt class="col-sm-4">Language:</dt>
+                    <dd class="col-sm-8">{{ summary.language|title }}</dd>
+                    
+                    <dt class="col-sm-4">Created:</dt>
+                    <dd class="col-sm-8">{{ summary.created_at.strftime('%B %d, %Y at %H:%M') }}</dd>
+                    
+                    <dt class="col-sm-4">Words Saved:</dt>
+                    <dd class="col-sm-8">{{ summary.original_length - summary.summary_length }} words</dd>
+                    
+                    <dt class="col-sm-4">Reduction:</dt>
+                    <dd class="col-sm-8">{{ "%.1f"|format((1 - (summary.summary_length / summary.original_length)) * 100) }}%</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-align-left"></i> Original Text</h5>
+            </div>
+            <div class="card-body">
+                <div class="original-text" style="max-height: 400px; overflow-y: auto;">
+                    {{ summary.original_text|replace('\n', '<br>')|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-file-contract"></i> Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="summary-text" style="max-height: 400px; overflow-y: auto;">
+                    {{ summary.summary_text|replace('\n', '<br>')|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

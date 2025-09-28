@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Text Summarizer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4"><i class="fas fa-file-alt text-primary"></i> Text Summarizer</h1>
+            <p class="lead">AI-powered text summarization tool that helps you quickly extract key information from long documents.</p>
+            <hr class="my-4">
+            <p>Summarize articles, research papers, documents, and more with advanced NLP algorithms.</p>
+            
+            {% if not current_user.is_authenticated %}
+            <div class="mt-4">
+                <a class="btn btn-primary btn-lg me-3" href="{{ url_for('auth.register') }}">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a class="btn btn-outline-primary btn-lg" href="{{ url_for('auth.login') }}">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+            </div>
+            {% else %}
+            <div class="mt-4">
+                <a class="btn btn-primary btn-lg me-3" href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                </a>
+                <a class="btn btn-outline-primary btn-lg" href="{{ url_for('history') }}">
+                    <i class="fas fa-history"></i> View History
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">AI-Powered</h5>
+                        <p class="card-text">Uses advanced NLP algorithms for accurate summarization.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Analytics</h5>
+                        <p class="card-text">Track your summarization history with detailed analytics.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p class="card-text">Your data is protected with secure authentication.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

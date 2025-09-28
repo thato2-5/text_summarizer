@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Text Summarizer{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ current_user.username }}! Here's your summarization overview.</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_summaries }}</h4>
+                        <p class="mb-0">Total Summaries</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-bar"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="activityChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-plus-circle"></i> New Summary</h5>
+            </div>
+            <div class="card-body">
+                <form id="summarizeForm">
+                    <div class="mb-3">
+                        <label for="textInput" class="form-label">Enter text to summarize:</label>
+                        <textarea class="form-control" id="textInput" rows="6" placeholder="Paste your text here..." required></textarea>
+                        <div class="form-text">Minimum 10 words required</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="methodSelect" class="form-label">Summarization Method:</label>
+                                <select class="form-select" id="methodSelect">
+                                    <option value="lsa">LSA (Latent Semantic Analysis)</option>
+                                    <option value="text_rank">TextRank</option>
+                                    <option value="luhn">Luhn</option>
+                                    <option value="lex_rank">LexRank</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="sentencesCount" class="form-label">Max Sentences:</label>
+                                <input type="number" class="form-control" id="sentencesCount" min="1" max="20" value="5">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100" id="summarizeBtn">
+                        <i class="fas fa-magic"></i> Generate Summary
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-history"></i> Recent Summaries</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_summaries %}
+                <div class="list-group">
+                    {% for summary in recent_summaries %}
+                    <a href="{{ url_for('view_summary', summary_id=summary.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ summary.title }}</h6>
+                            <small>{{ summary.created_at.strftime('%m/%d') }}</small>
+                        </div>
+                        <p class="mb-1 text-muted">{{ summary.summary_text[:100] }}...</p>
+                        <small class="text-muted">
+                            {{ summary.original_length }} words → {{ summary.summary_length }} words 
+                            ({{ "%.1f"|format(summary.compression_ratio) }}x compression)
+                        </small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No summaries yet. Create your first summary!</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-pie"></i> Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div id="summaryStats" class="text-center">
+                    <p class="text-muted">Generate a summary to see statistics</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Modal -->
+<div class="modal fade" id="summaryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-file-alt"></i> Summary Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="summaryResult"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-primary" id="viewDetailsBtn">View Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activity Chart
+    const analyticsData = {{ analytics_data|safe }};
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: analyticsData.labels,
+            datasets: [{
+                label: 'Summaries per Day',
+                data: analyticsData.data,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+    
+    // Summarization Form
+    const form = document.getElementById('summarizeForm');
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const text = document.getElementById('textInput').value.trim();
+        const method = document.getElementById('methodSelect').value;
+        const sentencesCount = document.getElementById('sentencesCount').value;
+        
+        if (text.split(/\s+/).length < 10) {
+            alert('Please enter at least 10 words');
+            return;
+        }
+        
+        const btn = document.getElementById('summarizeBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch('/summarize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    method: method,
+                    sentences_count: parseInt(sentencesCount)
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Display summary
+                document.getElementById('summaryResult').innerHTML = `
+                    <div class="mb-3">
+                        <h6>Original Text Stats:</h6>
+                        <ul>
+                            <li>Words: ${data.stats.original_length}</li>
+                            <li>Sentences: ${data.text_stats.sentence_count}</li>
+                            <li>Average Word Length: ${data.text_stats.avg_word_length.toFixed(1)}</li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Summary Stats:</h6>
+                        <ul>
+                            <li>Words: ${data.stats.summary_length}</li>
+                            <li>Compression Ratio: ${data.stats.compression_ratio}x</li>
+                            <li>Sentiment: ${data.stats.sentiment > 0 ? 'Positive' : data.stats.sentiment < 0 ? 'Negative' : 'Neutral'}</li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Summary:</h6>
+                        <div class="border p-3 bg-light rounded">
+                            ${data.summary}
+                        </div>
+                    </div>
+                `;
+                
+                // Update view details button
+                document.getElementById('viewDetailsBtn').href = `/summary/${data.summary_id}`;
+                
+                // Show modal
+                new bootstrap.Modal(document.getElementById('summaryModal')).show();
+                
+                // Update quick stats
+                document.getElementById('summaryStats').innerHTML = `
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h4>${data.stats.original_length}</h4>
+                            <small>Original Words</small>
+                        </div>
+                        <div class="col-4">
+                            <h4>${data.stats.summary_length}</h4>
+                            <small>Summary Words</small>
+                        </div>
+                        <div class="col-4">
+                            <h4>${data.stats.compression_ratio}x</h4>
+                            <small>Compression</small>
+                        </div>
+                    </div>
+                `;
+                
+                // Clear form
+                document.getElementById('textInput').value = '';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            btn.innerHTML = '<i class="fas fa-magic"></i> Generate Summary';
+            btn.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}
+
