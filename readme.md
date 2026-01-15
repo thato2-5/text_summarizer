@@ -23,7 +23,7 @@
 ![alt text](https://github.com/thato2-5/text_summarizer/blob/main/home07.png)
 
 # 1. System Architecture Diagram
-``` mermaid
+```mermaid
 graph TB
     subgraph "Frontend Layer"
         A[Web Browser] --> B[Flask Templates]
@@ -65,7 +65,7 @@ graph TB
 ```
 
 # 2. Database Schema Diagram
-``` mermaid
+```mermaid
 erDiagram
     USER {
         int id PK "Primary Key"
@@ -110,7 +110,7 @@ erDiagram
 ```
 
 # 3. User Authentication Flowchart
-``` mermaid
+```mermaid
 flowchart TD
     Start([Start]) --> CheckAuth{User Authenticated?}
     
@@ -154,7 +154,7 @@ flowchart TD
 ```
 
 # 4. Text Summarization Workflow
-``` mermaid
+```mermaid
 sequenceDiagram
     participant U as User
     participant F as Flask App
@@ -184,7 +184,7 @@ sequenceDiagram
 ```
 
 # 5. Component Relationship Diagram
-``` mermaid
+```mermaid
 graph LR
     subgraph "Core Components"
         A[Flask Application]
@@ -242,7 +242,7 @@ graph LR
 ```
 
 # 6. Data Flow Diagram
-``` mermaid
+```mermaid
 flowchart TD
     A[User Input Text] --> B{Input Validation}
     B -->|Valid| C[Text Preprocessing]
@@ -275,7 +275,7 @@ flowchart TD
 ```
 
 # 7. User Journey Map
-``` mermaid
+```mermaid
 journey
     title Text Summarizer User Journey
     section Registration
@@ -298,7 +298,7 @@ journey
 ```
 
 # 8. Deployment Architecture
-``` mermaid
+```mermaid
 graph TB
     subgraph "Production Environment"
         A[Load Balancer] --> B[Web Server 1]
@@ -332,7 +332,7 @@ graph TB
 ```
 
 # 9. API Endpoints Diagram
-``` mermaid
+```mermaid
 graph TD
     subgraph "Authentication Endpoints"
         A1[POST /auth/login] --> A2[User Login]
@@ -365,7 +365,7 @@ graph TD
 ```
 
 # 10. Security Architecture Diagram
-``` mermaid
+```mermaid
 graph TB
     subgraph "Security Layers"
         A[HTTPS Encryption] --> B[Firewall Protection]
@@ -400,7 +400,7 @@ graph TB
 ```
 
 # 11. Testing Strategy Diagram
-``` mermaid
+```mermaid
 graph TD
     subgraph "Testing Pyramid"
         A[Unit Tests] --> B[Component Tests]
@@ -437,7 +437,7 @@ graph TD
 ```
 
 # 12. Monitoring and Analytics Diagram
-``` mermaid
+```mermaid
 graph LR
     subgraph "Data Collection"
         A[User Interactions] --> B[Application Logs]
