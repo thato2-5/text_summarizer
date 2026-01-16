@@ -334,28 +334,28 @@ graph TB
 # 9. API Endpoints Diagram
 ```mermaid
 graph TD
-    subgraph "Authentication Endpoints"
-        A1[POST /auth/login] --> A2[User Login]
-        B1[POST /auth/register] --> B2[User Registration]
-        C1[GET /auth/logout] --> C2[User Logout]
+    subgraph "Authentication Flow"
+        A1[POST /auth/login] --> A2{Authenticate User<br/>Return JWT Token}
+        B1[POST /auth/register] --> B2{Create User Account<br/>Send Verification}
+        C1[POST /auth/logout] --> C2{Invalidate Token<br/>Clear Session}
     end
 
-    subgraph "Summary Endpoints"
-        D1[POST /summarize] --> D2[Generate Summary]
-        E1[GET /history] --> E2[View History]
-        F1[GET /summary/<id>] --> F2[View Single Summary]
-        G1[POST /delete_summary/<id>] --> G2[Delete Summary]
+    subgraph "Summary Management"
+        D1[POST /api/summarize] --> D2{Process Text/URL<br/>Generate & Store Summary}
+        E1[GET /api/history] --> E2{Retrieve User's<br/>Summary History}
+        F1[GET /api/summary/:id] --> F2{Validate Ownership<br/>Return Summary}
+        G1[DELETE /api/summary/:id] --> G2{Verify Permissions<br/>Remove Summary}
     end
 
-    subgraph "Analytics Endpoints"
-        H1[GET /dashboard] --> H2[Dashboard Data]
-        I1[GET /api/analytics] --> I2[Analytics JSON]
+    subgraph "Analytics & Dashboard"
+        H1[GET /api/dashboard] --> H2{Aggregate User Data<br/>Return Statistics}
+        I1[GET /api/analytics] --> I2{Process Metrics<br/>Return JSON Data}
     end
 
-    subgraph "Utility Endpoints"
-        J1[GET /] --> J2[Home Page]
-        K1[ERROR 404] --> K2[Not Found]
-        L1[ERROR 500] --> L2[Server Error]
+    subgraph "System Endpoints"
+        J1[GET /] --> J2{Serve Frontend<br/>or API Info}
+        K1[GET /health] --> K2{System Status<br/>& Metrics}
+        L1[GET /docs] --> L2{API Documentation<br/>& Examples}
     end
 
     style A1 fill:#c8e6c9
@@ -438,34 +438,46 @@ graph TD
 
 # 12. Monitoring and Analytics Diagram
 ```mermaid
-graph LR
-    subgraph "Data Collection"
-        A[User Interactions] --> B[Application Logs]
-        C[System Metrics] --> D[Performance Data]
-        E[Error Tracking] --> F[Exception Reports]
+graph TB
+    subgraph "Data Sources"
+        A[User Requests & Actions] --> B[Application Logs]
+        C[System Resources] --> D[Performance Metrics]
+        E[Application Errors] --> F[Error Traces]
+        G[Business Events] --> H[Usage Analytics]
     end
 
-    subgraph "Processing"
-        G[Log Aggregation] --> H[Data Analysis]
-        I[Metric Processing] --> J[Trend Analysis]
-        K[Alert System] --> L[Notification Engine]
+    subgraph "Processing Pipeline"
+        I[Log Aggregator<br/>e.g., Fluentd, Logstash] --> J[Message Queue<br/>e.g., Kafka, RabbitMQ]
+        K[Metrics Collector<br/>e.g., Prometheus] --> L[Time-Series Database]
+        M[Error Collector<br/>e.g., Sentry] --> N[Error Database]
+        
+        J --> O[Stream Processor]
+        L --> P[Metric Analyzer]
+        N --> Q[Error Analyzer]
     end
 
-    subgraph "Visualization"
-        M[Dashboard] --> N[Real-time Charts]
-        O[Reports] --> P[Historical Data]
-        Q[Alerts] --> R[Status Monitoring]
+    subgraph "Storage & Analysis"
+        O --> R[Processed Data Store]
+        P --> S[Aggregated Metrics]
+        Q --> T[Error Trends]
+        
+        R --> U[Analytics Engine]
+        S --> U
+        T --> U
     end
 
-    B --> G
-    D --> I
-    F --> K
-    
-    H --> M
-    J --> O
-    L --> Q
+    subgraph "Visualization & Alerting"
+        U --> V[Monitoring Dashboard<br/>e.g., Grafana]
+        U --> W[Scheduled Reports<br/>PDF/Email]
+        U --> X[Alert Manager<br/>Slack/Email/PagerDuty]
+        
+        V --> Y[Real-time Charts]
+        W --> Z[Historical Insights]
+        X --> AA[Incident Response]
+    end
 
     style A fill:#f3e5f5
-    style G fill:#c8e6c9
-    style M fill:#bbdefb
+    style I fill:#c8e6c9
+    style V fill:#bbdefb
+    style X fill:#ffccbc
 ```
