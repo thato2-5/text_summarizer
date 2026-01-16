@@ -252,8 +252,8 @@ pytest --cov=app tests/
 ```
 
 ## Support
-- Issues: https://github.com/yourusername/text-summarizer-api/issues
-- Email: support@yourdomain.com
+- Issues: https://github.com/thato2-5/text_summarizer/issues
+- Email: support@monyatech.org.za
 
 ## Performance
 - Average response time: < 500ms
